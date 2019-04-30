@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1.csproj", "{CA317D3D-3B69-4FF6-A4CF-5C18130C02C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudProjectServer", "..\CloudProjectServer\CloudProjectServer.csproj", "{447F7483-FF13-465D-9949-56591D6A1C96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfSocketClient", "..\WpfSocketClient\WpfSocketClient.csproj", "{C9C56E0B-689B-41F6-9F6C-0B4F3A86B389}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA317D3D-3B69-4FF6-A4CF-5C18130C02C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA317D3D-3B69-4FF6-A4CF-5C18130C02C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA317D3D-3B69-4FF6-A4CF-5C18130C02C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA317D3D-3B69-4FF6-A4CF-5C18130C02C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{447F7483-FF13-465D-9949-56591D6A1C96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{447F7483-FF13-465D-9949-56591D6A1C96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{447F7483-FF13-465D-9949-56591D6A1C96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{447F7483-FF13-465D-9949-56591D6A1C96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C56E0B-689B-41F6-9F6C-0B4F3A86B389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C56E0B-689B-41F6-9F6C-0B4F3A86B389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C56E0B-689B-41F6-9F6C-0B4F3A86B389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C56E0B-689B-41F6-9F6C-0B4F3A86B389}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
