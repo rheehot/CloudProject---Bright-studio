@@ -1,81 +1,85 @@
 ﻿using System;
+using Fleck;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
-public class SynchronousSocketListener
+public class SyncSocketListener
 {
 
-    // Incoming data from the client.  
-    public static string data = null;
-
-    public static void StartListening()
-    {
-        // Data buffer for incoming data.  
-        byte[] bytes = new Byte[1024];
-
-        // Establish the local endpoint for the socket.  
-        // Dns.GetHostName returns the name of the   
-        // host running the application.  
-        IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-        IPAddress ipAddress = ipHostInfo.AddressList[0];
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
-
-        // Create a TCP/IP socket.  
-        Socket listener = new Socket(ipAddress.AddressFamily,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        // Bind the socket to the local endpoint and   
-        // listen for incoming connections.  
-        try
-        {
-            listener.Bind(localEndPoint);
-            listener.Listen(10);
-
-            // Start listening for connections.  
-            while (true)
-            {
-                Console.WriteLine("Waiting for a connection...");
-                // Program is suspended while waiting for an incoming connection.  
-                Socket handler = listener.Accept();
-                data = null;
-
-                // An incoming connection needs to be processed.  
-                while (true)
-                {
-                    int bytesRec = handler.Receive(bytes);
-                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    if (data.IndexOf("<EOF>") > -1)
-                    {
-                        break;
-                    }
-                }
-
-                // Show the data on the console.  
-                Console.WriteLine("Text received : {0}", data);
-
-                // Echo the data back to the client.  
-                byte[] msg = Encoding.ASCII.GetBytes(data);
-
-                handler.Send(msg);
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-            }
-
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-        }
-
-        Console.WriteLine("\nPress ENTER to continue...");
-        Console.Read();
-
-    }
+    public static IConfiguration Settings;
 
     public static int Main(String[] args)
     {
-        StartListening();
+        Settings = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    {"SubscriptionKey", "85e67eabe2994a55a8cec7d8c5cb09fd"},
+                    {"FaceEndpoint", "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"},
+                    {"WSInputPort", "12217"},
+                    {"IsWsSecurity", "false"},
+                    {"ImageFolder", @"D:\Images"},
+                    {"ImageFormat", ".jpg"},
+                    {"DbConnectionString", "Server=localhost;Database=ThesisDb;Trusted_Connection=True;"},
+                    {"WSOutputPort", "12218"}
+                })
+                .Build();
+
+        //var mainDataProcessing = new MainDataProcessing();
+
+        var wsType = bool.Parse(Settings["IsWsSecurity"]) ? "wss" : "ws";
+        var webSocketApplier = new WebSocketServer($"{wsType}://0.0.0.0:{Settings["WSInputPort"]}");
+        var webSocketSender  = new WebSocketServer($"{wsType}://0.0.0.0:{Settings["WSOutputPort"]}");
+
+        webSocketApplier.Start(socket =>
+        {
+            socket.OnOpen = () =>
+                Console.WriteLine($"A:New connection from {socket.ConnectionInfo.ClientIpAddress}");
+
+            socket.OnClose = () =>
+                Console.WriteLine($"A:Connection lost with {socket.ConnectionInfo.ClientIpAddress}");
+
+            socket.OnError = e =>
+                Console.WriteLine($"A:Error in connection with {socket.ConnectionInfo.ClientIpAddress}: {e.Message}");
+
+            socket.OnMessage = msg =>
+            {
+                var message = msg; //From json or somehow?
+                Console.WriteLine($"New message!: {msg}");
+                if (message == null) return;
+
+            };
+        });
+
+        webSocketSender.Start(socket =>
+        {
+            socket.OnOpen = () =>
+                Console.WriteLine($"S:New connection from {socket.ConnectionInfo.ClientIpAddress}");
+
+            socket.OnClose = () =>
+                Console.WriteLine($"S:Connection lost with {socket.ConnectionInfo.ClientIpAddress}");
+
+            socket.OnError = e =>
+                   Console.WriteLine($"S:Error in connection with {socket.ConnectionInfo.ClientIpAddress}");
+
+            socket.OnMessage = msg =>
+            {
+                var message = msg; //From json or somehow?
+                if (message == null) return;
+                socket.Send(msg);
+            };
+        });
+
+        bool on = true;
+
+        while (on)
+        {
+            var key = Console.ReadKey();
+            if (key.Key == ConsoleKey.C) break;
+        }
+
         return 0;
     }
 
